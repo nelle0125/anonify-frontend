@@ -1,3 +1,4 @@
+// src/components/Layout/Sidebar.jsx
 import React, { useState, useEffect } from "react";
 import {
   FiHome,
@@ -11,17 +12,13 @@ import {
 import logo from "../../assets/logo.png"; // small logo icon
 import "./Sidebar.scss";
 
-export default function Sidebar() {
+export default function Sidebar({ active, setActive }) {
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [active, setActive] = useState("Home");
 
   // Auto-collapse on smaller screens
   useEffect(() => {
-    const handleResize = () => {
-      setIsCollapsed(window.innerWidth <= 900);
-    };
-
-    handleResize(); // run on mount
+    const handleResize = () => setIsCollapsed(window.innerWidth <= 900);
+    handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
@@ -38,6 +35,7 @@ export default function Sidebar() {
 
   return (
     <aside className={`sidebar ${isCollapsed ? "collapsed" : ""}`}>
+      {/* Logo Section */}
       <div className="sidebar-logo">
         {isCollapsed ? (
           <img src={logo} alt="Anonify" className="logo-icon" />
@@ -46,30 +44,35 @@ export default function Sidebar() {
         )}
       </div>
 
+      {/* Navigation */}
       <nav className="sidebar-nav">
         {navItems.map((item) => (
-          <a
+          <button
             key={item.name}
-            href="#"
             className={`nav-item ${active === item.name ? "active" : ""}`}
             onClick={() => setActive(item.name)}
           >
             {item.icon}
             {!isCollapsed && <span>{item.name}</span>}
-          </a>
+            {active === item.name && !isCollapsed && (
+              <div className="active-indicator" />
+            )}
+          </button>
         ))}
 
         {/* Profile always at bottom */}
-        <a
-          href="#"
-          className={`nav-item profile-link ${
-            active === "Profile" ? "active" : ""
-          }`}
-          onClick={() => setActive("Profile")}
-        >
-          <FiUser />
-          {!isCollapsed && <span>Profile</span>}
-        </a>
+        <div className="sidebar-profile">
+          <button
+            className={`nav-item profile-link ${active === "Profile" ? "active" : ""}`}
+            onClick={() => setActive("Profile")}
+          >
+            <FiUser />
+            {!isCollapsed && <span>Profile</span>}
+            {active === "Profile" && !isCollapsed && (
+              <div className="active-indicator" />
+            )}
+          </button>
+        </div>
       </nav>
     </aside>
   );

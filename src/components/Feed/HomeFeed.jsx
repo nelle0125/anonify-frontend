@@ -11,9 +11,8 @@ export default function HomeFeed({ currentUser }) {
   const [newPostImage, setNewPostImage] = useState(null);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [showPoll, setShowPoll] = useState(false);
-  const [notif, setNotif] = useState(null); // notification state
+  const [notif, setNotif] = useState(null); // { message: string, type: "repost" | "report" }
 
-  // Poll features
   const [pollOptions, setPollOptions] = useState(["", ""]);
   const [pollDuration, setPollDuration] = useState("1d");
   const [visibility, setVisibility] = useState("everyone");
@@ -22,7 +21,7 @@ export default function HomeFeed({ currentUser }) {
   /** Emoji selection */
   const onEmojiClick = ({ emoji }) => setNewPostText((prev) => prev + emoji);
 
-  /** Handle image upload */
+  /** Image upload */
   const handleImageUpload = (e) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
@@ -31,8 +30,6 @@ export default function HomeFeed({ currentUser }) {
       return () => URL.revokeObjectURL(imageUrl);
     }
   };
-
-  /** Remove image preview */
   const removeImage = () => setNewPostImage(null);
 
   /** Poll management */
@@ -55,7 +52,7 @@ export default function HomeFeed({ currentUser }) {
     setShowPoll(false);
   };
 
-  /** Create post */
+  /** Create new post */
   const handleCreatePost = () => {
     const hasPoll = showPoll && pollOptions.some((o) => o.trim());
     if (!newPostText.trim() && !newPostImage && !hasPoll) return;
@@ -79,10 +76,13 @@ export default function HomeFeed({ currentUser }) {
       likes: [],
       comments: [],
       reposts: [],
+      reports: [],
+      hidden: false,
       createdAt: Date.now(),
       showComments: false,
       isRepost: false,
       originalUser: null,
+      originalPostId: null,
     };
 
     setPosts((prev) => [newPost, ...prev]);
@@ -90,10 +90,10 @@ export default function HomeFeed({ currentUser }) {
     setNewPostImage(null);
     setShowEmojiPicker(false);
     resetPoll();
-    setVisibility("everyone"); // reset
+    setVisibility("everyone");
   };
 
-  /** Likes */
+  /** Like a post */
   const handleLike = (postId) => {
     const userHandle = currentUser?.handle || "anon_user";
     setPosts((prev) =>
@@ -110,26 +110,29 @@ export default function HomeFeed({ currentUser }) {
     );
   };
 
-  /** Reposts */
+  /** Repost logic */
   const handleRepost = (postId) => {
     const userHandle = currentUser?.handle || "anon_user";
+    const targetPost = posts.find((p) => p.id === postId);
+    if (!targetPost) return;
+    const originalPostId = targetPost.isRepost ? targetPost.originalPostId : targetPost.id;
+    const originalPost = posts.find((p) => p.id === originalPostId);
+    if (!originalPost) return;
 
     setPosts((prev) =>
       prev.map((p) =>
-        p.id === postId
+        p.id === originalPostId
           ? {
               ...p,
               reposts: p.reposts.includes(userHandle)
-                ? p.reposts.filter((u) => u !== userHandle) // undo repost
+                ? p.reposts.filter((u) => u !== userHandle)
                 : [...p.reposts, userHandle],
             }
           : p
       )
     );
 
-    // Add repost notification and new post
-    const originalPost = posts.find((p) => p.id === postId);
-    if (originalPost && !originalPost.reposts.includes(userHandle)) {
+    if (!originalPost.reposts.includes(userHandle)) {
       const repost = {
         ...originalPost,
         id: Date.now(),
@@ -137,7 +140,6 @@ export default function HomeFeed({ currentUser }) {
           handle: currentUser?.handle || "anon_user",
           avatar: currentUser?.avatar || defaultAvatar,
         },
-        content: originalPost.content,
         likes: [],
         reposts: [],
         comments: [],
@@ -145,16 +147,18 @@ export default function HomeFeed({ currentUser }) {
         showComments: false,
         isRepost: true,
         originalUser: originalPost.user.handle,
+        originalPostId: originalPost.id,
+        reports: [],
+        hidden: false,
       };
       setPosts((prev) => [repost, ...prev]);
 
-      // Show notification
-      setNotif(`You reposted @${originalPost.user.handle}`);
+      setNotif({ message: `You reposted @${originalPost.user.handle}`, type: "repost" });
       setTimeout(() => setNotif(null), 3000);
     }
   };
 
-  /** Comments */
+  /** Add comment */
   const handleAddComment = (postId, text) => {
     if (!text.trim()) return;
     setPosts((prev) =>
@@ -162,10 +166,7 @@ export default function HomeFeed({ currentUser }) {
         p.id === postId
           ? {
               ...p,
-              comments: [
-                ...p.comments,
-                { user: currentUser, text, createdAt: Date.now() },
-              ],
+              comments: [...p.comments, { user: currentUser, text, createdAt: Date.now() }],
             }
           : p
       )
@@ -181,7 +182,49 @@ export default function HomeFeed({ currentUser }) {
     );
   };
 
-  /** Hide emoji on scroll */
+  /** Poll voting (updates original if reposted) */
+  const handleVote = (postId, option) => {
+    const userHandle = currentUser?.handle || "anon_user";
+
+    setPosts((prev) =>
+      prev.map((p) => {
+        const originalId = prev.find((post) => post.id === postId)?.originalPostId;
+        const isTarget = p.id === postId || p.id === originalId;
+        if (!isTarget || !p.poll) return p;
+        if (p.poll.votes.some((v) => v.user === userHandle)) return p;
+
+        return {
+          ...p,
+          poll: { ...p.poll, votes: [...p.poll.votes, { user: userHandle, option }] },
+        };
+      })
+    );
+  };
+
+  /** Report post */
+  const handleReport = (postId) => {
+    const userHandle = currentUser?.handle || "anon_user";
+    setPosts((prev) =>
+      prev.map((p) => {
+        if (p.id !== postId) return p;
+        if (p.reports?.includes(userHandle)) return p;
+
+        const newReports = [...(p.reports || []), userHandle];
+        return { ...p, reports: newReports, hidden: newReports.length >= 100 };
+      })
+    );
+
+    // Show report notification
+    setNotif({ message: "You reported this post", type: "report" });
+    setTimeout(() => setNotif(null), 3000);
+  };
+
+  /** Delete post */
+  const handleDelete = (postId) => {
+    setPosts((prev) => prev.filter((p) => p.id !== postId));
+  };
+
+  /** Hide emoji picker on scroll */
   useEffect(() => {
     const feedEl = feedRef.current;
     if (!feedEl) return;
@@ -195,11 +238,7 @@ export default function HomeFeed({ currentUser }) {
       {/* CREATE POST */}
       <div className="create-post">
         <div className="top-row">
-          <img
-            src={currentUser?.avatar || defaultAvatar}
-            alt="user"
-            className="avatar"
-          />
+          <img src={currentUser?.avatar || defaultAvatar} alt="user" className="avatar" />
           <input
             type="text"
             placeholder="What's happening?"
@@ -210,21 +249,15 @@ export default function HomeFeed({ currentUser }) {
           />
         </div>
 
-        {/* Image Preview */}
         {newPostImage && (
           <div className="image-preview">
             <img src={newPostImage} alt="preview" className="preview-img" />
-            <button
-              className="remove-img-btn"
-              onClick={removeImage}
-              aria-label="Remove image"
-            >
+            <button className="remove-img-btn" onClick={removeImage} aria-label="Remove image">
               <FiX />
             </button>
           </div>
         )}
 
-        {/* Poll Builder */}
         {showPoll && (
           <div className="poll-builder">
             {pollOptions.map((opt, idx) => (
@@ -237,21 +270,14 @@ export default function HomeFeed({ currentUser }) {
                   aria-label={`Poll option ${idx + 1}`}
                 />
                 {pollOptions.length > 2 && (
-                  <button
-                    onClick={() => removePollOption(idx)}
-                    aria-label="Remove poll option"
-                  >
+                  <button onClick={() => removePollOption(idx)} aria-label="Remove poll option">
                     <FiX />
                   </button>
                 )}
               </div>
             ))}
             {pollOptions.length < 4 && (
-              <button
-                className="add-poll-btn"
-                onClick={addPollOption}
-                aria-label="Add poll option"
-              >
+              <button className="add-poll-btn" onClick={addPollOption} aria-label="Add poll option">
                 + Add option
               </button>
             )}
@@ -268,35 +294,20 @@ export default function HomeFeed({ currentUser }) {
           </div>
         )}
 
-        {/* Actions */}
         <div className="action-row">
           <div className="post-icons">
             <label className="file-upload" aria-label="Upload image">
               <FiImage />
               <input type="file" accept="image/*" onChange={handleImageUpload} />
             </label>
-            <button
-              className="icon-btn"
-              onClick={() => setShowEmojiPicker((p) => !p)}
-              aria-label="Add emoji"
-            >
+            <button className="icon-btn" onClick={() => setShowEmojiPicker(p => !p)} aria-label="Add emoji">
               <FiSmile />
             </button>
-            <button
-              className="icon-btn"
-              onClick={() => setShowPoll((p) => !p)}
-              aria-label="Toggle poll"
-            >
+            <button className="icon-btn" onClick={() => setShowPoll(p => !p)} aria-label="Toggle poll">
               <FiBarChart2 />
             </button>
-
-            {/* Visibility Dropdown */}
             <div className="dropdowns">
-              <select
-                value={visibility}
-                onChange={(e) => setVisibility(e.target.value)}
-                aria-label="Reply visibility"
-              >
+              <select value={visibility} onChange={(e) => setVisibility(e.target.value)} aria-label="Reply visibility">
                 <option value="everyone">Everyone</option>
                 <option value="followers">Followers</option>
                 <option value="mentioned">Mentioned only</option>
@@ -306,17 +317,12 @@ export default function HomeFeed({ currentUser }) {
           <button
             className="post-btn"
             onClick={handleCreatePost}
-            disabled={
-              !newPostText.trim() &&
-              !newPostImage &&
-              (!showPoll || pollOptions.every((o) => !o))
-            }
+            disabled={!newPostText.trim() && !newPostImage && (!showPoll || pollOptions.every(o => !o))}
           >
             Post
           </button>
         </div>
 
-        {/* Emoji Picker */}
         {showEmojiPicker && (
           <div className="emoji-picker-wrapper">
             <EmojiPicker onEmojiClick={onEmojiClick} height={350} width="100%" theme="dark" />
@@ -324,24 +330,30 @@ export default function HomeFeed({ currentUser }) {
         )}
       </div>
 
-      {/* Repost Notification */}
-      {notif && <div className="repost-notif">{notif}</div>}
+      {/* Notification popup */}
+      {notif && <div className={`notif-popup ${notif.type}`}>{notif.message}</div>}
 
       {/* POSTS */}
-      {posts.length === 0 ? (
+      {posts.filter(p => !p.hidden).length === 0 ? (
         <p className="empty-feed">No posts yet.</p>
       ) : (
-        posts.map((post) => (
-          <PostItem
-            key={post.id}
-            post={post}
-            currentUser={currentUser}
-            onLike={handleLike}
-            onRepost={handleRepost}
-            onAddComment={handleAddComment}
-            onToggleComments={handleToggleComments}
-          />
-        ))
+        posts
+          .filter(p => !p.hidden)
+          .map(post => (
+            <PostItem
+              key={post.id}
+              post={post}
+              posts={posts}
+              currentUser={currentUser}
+              onLike={handleLike}
+              onRepost={handleRepost}
+              onAddComment={handleAddComment}
+              onToggleComments={handleToggleComments}
+              onVote={handleVote}
+              onReport={handleReport}
+              onDelete={handleDelete}
+            />
+          ))
       )}
     </div>
   );

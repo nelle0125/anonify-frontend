@@ -756,17 +756,20 @@
   }
 }
 
-/* Smooth fadeIn animation */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(4px); }
-  to { opacity: 1; transform: translateY(0); }
+/* Smooth fadeInOut animation */
+@keyframes fadeInOut {
+  0% { opacity: 0; transform: translateY(-10px); }
+  10% { opacity: 1; transform: translateY(0); }
+  90% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-10px); }
 }
 
-.repost-notif {
+/* Base notification style */
+.notif-popup {
   position: fixed;
   top: 80px;
-  right: 20px;
-  background-color: #1da1f2;
+  left: 45%;
+  transform: translateX(-50%);
   color: white;
   padding: 8px 16px;
   border-radius: 20px;
@@ -774,14 +777,20 @@
   box-shadow: 0 4px 8px rgba(0,0,0,0.2);
   animation: fadeInOut 3s forwards;
   z-index: 1000;
+  text-align: center;
 }
 
-@keyframes fadeInOut {
-  0% { opacity: 0; transform: translateY(-10px); }
-  10% { opacity: 1; transform: translateY(0); }
-  90% { opacity: 1; transform: translateY(0); }
-  100% { opacity: 0; transform: translateY(-10px); }
+/* Repost notification */
+.notif-popup.repost {
+  background-color: #1da1f2; /* Twitter-like blue */
 }
+
+/* Report notification */
+.notif-popup.report {
+  background-color: #ff5c5c; /* Red for report */
+}
+
+
 
 
 /* ---------------- RESPONSIVE ---------------- */
@@ -798,26 +807,62 @@
 
 @media (max-width: 600px) {
   .home-feed {
-    padding: 12px;
+    padding: 10px;
   }
 
-  .create-post .avatar,
-  .post-item .post-header .avatar {
-    width: 36px;
-    height: 36px;
+  /* Top row: hide avatar, make input adaptive */
+  .create-post .top-row {
+    gap: 8px;
+    flex-wrap: nowrap;
+    align-items: center;
   }
 
-  .create-post input,
-  .comment-input {
+  .create-post .avatar {
+    display: none;
+  }
+
+  .create-post input[type="text"] {
+    flex: 1;           /* fill remaining space */
+    min-width: 0;      /* allow shrinking if needed */
+    width: 100%;       /* ensure full width */
     font-size: 13px;
+    padding: 8px 12px;
+    box-sizing: border-box;
   }
 
+  .comment-input {
+    flex: 1;
+    width: 100%;
+    font-size: 13px;
+    padding: 8px 12px;
+    box-sizing: border-box;
+  }
+
+  /* Post content */
   .post-item .post-content {
     font-size: 13px;
   }
 
+  /* Comments */
   .comment-bubble {
-    font-size: 0.9rem;
-    padding: 5px 8px;
+    font-size: 0.88rem;
+    padding: 4px 6px;
+  }
+
+  /* Action row */
+  .create-post .action-row {
+    flex-wrap: wrap;          /* wrap if necessary */
+    justify-content: space-between;
+    gap: 6px;
+  }
+
+  .post-icons .dropdowns {
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  .post-btn {
+    flex: 0 0 auto;           /* keep original width */
+    min-width: 90px;
   }
 }

@@ -1,5 +1,4 @@
-// src/components/Feed/PostItem.jsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   FiHeart,
   FiMessageCircle,
@@ -12,15 +11,18 @@ import defaultAvatar from "../../assets/default-avatar.png";
 export default function PostItem({
   post,
   currentUser,
+  posts,
   onLike,
   onRepost,
   onAddComment,
   onToggleComments,
   onReport,
+  onDelete,
+  onVote,
+  isEmbedded = false,
 }) {
   const [showOptions, setShowOptions] = useState(false);
   const [userVote, setUserVote] = useState(null);
-  const [votes, setVotes] = useState(post.poll?.votes || []);
 
   const userHandle = currentUser?.handle || "anon_user";
   const likes = post.likes || [];
@@ -30,20 +32,51 @@ export default function PostItem({
   const liked = likes.includes(userHandle);
   const reposted = reposts.includes(userHandle);
 
-  /** Event Handlers */
+  /** Original post for repost */
+  const originalPost = post.originalPostId
+    ? posts.find((p) => p.id === post.originalPostId)
+    : null;
+
+  /** Use poll votes from original post if reposted */
+  const pollData = originalPost?.poll || post.poll;
+  const pollVotes = originalPost?.poll?.votes || post.poll?.votes || [];
+
+  /** Sync local userVote if already voted */
+  useEffect(() => {
+    const existingVote = pollVotes.find((v) => v.user === userHandle);
+    if (existingVote) setUserVote(existingVote.option);
+  }, [pollVotes, userHandle]);
+
+  /** Poll voting */
+  const handleVote = (option) => {
+    if (!pollData || userVote) return;
+    setUserVote(option);
+    onVote?.(post.id, option);
+  };
+
+  const pollResults = () => {
+    if (!pollData) return [];
+    const totalVotes = pollVotes.length;
+    return pollData.options.map((opt) => {
+      const votesForOpt = pollVotes.filter((v) => v.option === opt).length;
+      const percent = totalVotes ? Math.round((votesForOpt / totalVotes) * 100) : 0;
+      return { option: opt, percent, votes: votesForOpt };
+    });
+  };
+
+  /** Event handlers */
   const handleLike = () => onLike?.(post.id);
   const handleRepost = () => onRepost?.(post.id);
   const handleToggleComments = () => onToggleComments?.(post.id);
+
   const handleReport = () => {
     setShowOptions(false);
     onReport?.(post.id);
   };
 
-  /** Poll voting */
-  const handleVote = (option) => {
-    if (!post.poll || userVote) return; // prevent multiple votes
-    setUserVote(option);
-    setVotes((prev) => [...prev, { user: userHandle, option }]);
+  const handleDelete = () => {
+    setShowOptions(false);
+    onDelete?.(post.id);
   };
 
   /** Time formatter */
@@ -56,19 +89,8 @@ export default function PostItem({
     return `${Math.floor(diff / 86400)}d ago`;
   };
 
-  /** Poll percentages */
-  const pollResults = () => {
-    if (!post.poll) return [];
-    const totalVotes = votes.length;
-    return post.poll.options.map((opt) => {
-      const votesForOpt = votes.filter((v) => v.option === opt).length;
-      const percent = totalVotes ? Math.round((votesForOpt / totalVotes) * 100) : 0;
-      return { option: opt, percent, votes: votesForOpt };
-    });
-  };
-
   return (
-    <article className="post-item">
+    <article className={`post-item ${isEmbedded ? "embedded" : ""}`}>
       {/* HEADER */}
       <div className="post-header">
         <div className="post-user">
@@ -82,10 +104,10 @@ export default function PostItem({
             <span className="post-time">
               {timeAgo(post.createdAt)} · 👁 {post.visibility || "everyone"}
             </span>
-            {/* Show repost info if applicable */}
-            {post.isRepost && post.originalUser && (
+
+            {post.isRepost && originalPost && (
               <div className="repost-info">
-                <small>@{post.user.handle} reposted @{post.originalUser}</small>
+                <small>@{post.user.handle} reposted @{originalPost.user.handle}</small>
               </div>
             )}
           </div>
@@ -104,9 +126,7 @@ export default function PostItem({
             <div className="post-options-menu">
               <button onClick={handleReport}>Report Post</button>
               {post.user?.handle === userHandle && (
-                <button onClick={() => alert("Delete functionality here")}>
-                  Delete Post
-                </button>
+                <button onClick={handleDelete}>Delete Post</button>
               )}
             </div>
           )}
@@ -115,67 +135,83 @@ export default function PostItem({
 
       {/* BODY */}
       <div className="post-body">
-        {post.content && <p className="post-content">{post.content}</p>}
-        {post.image && <img src={post.image} alt="post" className="post-image" />}
-
-        {/* Polls */}
-        {post.poll && (
-          <div className="post-poll">
-            {pollResults().map(({ option, percent, votes: count }) => (
-              <div
-                key={option}
-                className={`poll-option ${userVote === option ? "voted" : ""}`}
-                onClick={() => handleVote(option)}
-                role="button"
-                tabIndex={0}
-                aria-label={`Vote for ${option}`}
-                aria-disabled={!!userVote}
-              >
-                <div className="poll-bar-wrapper">
-                  <div className="poll-bar" style={{ width: `${percent}%` }} />
-                </div>
-                <div className="poll-content">
-                  <span className="poll-text">{option}</span>
-                  {userVote && <span className="poll-stats">{percent}% ({count})</span>}
+        {originalPost ? (
+          <PostItem
+            post={originalPost}
+            currentUser={currentUser}
+            posts={posts}
+            onLike={onLike}
+            onRepost={onRepost}
+            onAddComment={onAddComment}
+            onToggleComments={onToggleComments}
+            onReport={onReport}
+            onVote={onVote}
+            isEmbedded={true}
+          />
+        ) : (
+          <>
+            {post.content && <p className="post-content">{post.content}</p>}
+            {post.image && <img src={post.image} alt="post" className="post-image" />}
+            {pollData && (
+              <div className="post-poll">
+                {pollResults().map(({ option, percent, votes: count }) => (
+                  <div
+                    key={option}
+                    className={`poll-option ${userVote === option ? "voted" : ""}`}
+                    onClick={() => handleVote(option)}
+                    role="button"
+                    tabIndex={0}
+                    aria-label={`Vote for ${option}`}
+                    aria-disabled={!!userVote}
+                  >
+                    <div className="poll-bar-wrapper">
+                      <div className="poll-bar" style={{ width: `${percent}%` }} />
+                    </div>
+                    <div className="poll-content">
+                      <span className="poll-text">{option}</span>
+                      {userVote && <span className="poll-stats">{percent}% ({count})</span>}
+                    </div>
+                  </div>
+                ))}
+                <div className="poll-meta">
+                  {pollVotes.length} votes · ends in {pollData.duration}
                 </div>
               </div>
-            ))}
-            <div className="poll-meta">
-              {votes.length} votes · ends in {post.poll.duration}
-            </div>
-          </div>
+            )}
+          </>
         )}
       </div>
 
       {/* ACTIONS */}
-      <div className="post-actions">
-        <button
-          className="action commenting"
-          onClick={handleToggleComments}
-          aria-label="Toggle comments"
-        >
-          <FiMessageCircle /> <span>{comments.length}</span>
-        </button>
+      {!isEmbedded && (
+        <div className="post-actions">
+          <button
+            className="action commenting"
+            onClick={handleToggleComments}
+            aria-label="Toggle comments"
+          >
+            <FiMessageCircle /> <span>{comments.length}</span>
+          </button>
 
-        <button
-          className={`action reposting ${reposted ? "reposted" : ""}`}
-          onClick={handleRepost}
-          aria-label="Repost"
-        >
-          <FiRepeat /> <span>{reposts.length}</span>
-        </button>
+          <button
+            className={`action reposting ${reposted ? "reposted" : ""}`}
+            onClick={handleRepost}
+            aria-label="Repost"
+          >
+            <FiRepeat /> <span>{reposts.length}</span>
+          </button>
 
-        <button
-          className={`action liking ${liked ? "liked" : ""}`}
-          onClick={handleLike}
-          aria-label="Like"
-        >
-          <FiHeart /> <span>{likes.length}</span>
-        </button>
-      </div>
+          <button
+            className={`action liking ${liked ? "liked" : ""}`}
+            onClick={handleLike}
+            aria-label="Like"
+          >
+            <FiHeart /> <span>{likes.length}</span>
+          </button>
+        </div>
+      )}
 
-      {/* COMMENTS */}
-      {post.showComments && (
+      {!isEmbedded && post.showComments && (
         <CommentList
           comments={comments}
           addComment={(text) => onAddComment?.(post.id, text)}
