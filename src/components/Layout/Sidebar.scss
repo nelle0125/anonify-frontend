@@ -1,15 +1,17 @@
 .sidebar {
   width: 250px;
-  background: #0a0a0a; // full dark theme
+  background: #0a0a0a;
   border-right: 1px solid #1a1a1a;
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  margin-left: 100px;
+  height: 100vh; // 🔑 always full height
   position: sticky;
   top: 0;
   transition: width 0.4s ease-in-out, background 0.3s ease-in-out;
   color: #ccc;
   padding: 20px 14px;
+  box-sizing: border-box;
 
   .sidebar-logo {
     margin-bottom: 2rem;
@@ -23,15 +25,13 @@
       font-weight: 700;
       color: #ccc;
       letter-spacing: 1px;
-      transition: opacity 0.4s ease-in-out, transform 0.3s ease-in-out;
     }
 
     img {
       width: 40px;
       height: 40px;
       object-fit: contain;
-      display: none; // hidden in desktop
-      transition: transform 0.4s ease-in-out;
+      display: none;
     }
   }
 
@@ -39,36 +39,29 @@
     display: flex;
     flex-direction: column;
     gap: 0.6rem;
-    flex: 1;
+    flex: 1; // 🔑 pushes footer down
 
-    .nav-item,
-    .profile-link {
+    .nav-item {
       display: flex;
       align-items: center;
       gap: 14px;
       font-size: 1.05rem;
-      background-color: #0a0a0a;
-      color: #888; // non-active text color
-      text-decoration: none;
+      background-color: transparent;
+      color: #888;
       padding: 10px;
       border-radius: 20px;
-      border-style: none;
+      border: none;
       cursor: pointer;
-      transition: 
-        background 0.2s ease-in-out,
-        color 0.2s ease-in-out,
-        transform 0.2s ease-in-out;
+      transition: background 0.2s, color 0.2s, transform 0.2s;
 
       svg {
         font-size: 22px;
         color: #888;
-        transition: 
-          transform 0.35s cubic-bezier(0.25, 1, 0.5, 1), 
-          color 0.3s ease-in-out;
+        transition: transform 0.3s, color 0.3s;
       }
 
       &:hover {
-        background: #1a1a1a; // dark hover background
+        background: #1a1a1a;
         color: #fff;
         transform: translateX(3px);
 
@@ -79,31 +72,74 @@
       }
 
       &.active {
-        background: #141414; // slightly lighter active background
+        background: #141414;
         font-weight: 600;
-        transform: translateX(3px);
 
         svg {
-          color: #1da1f2; // only icon is highlighted
+          color: #1da1f2;
         }
 
         span {
-          color: #ccc; // keep text normal
+          color: #ccc;
         }
       }
     }
+  }
 
-    .profile-link {
-      margin-top: auto; // push to bottom
+  /* --- 🔴 Logout button fixed at bottom, fully visible --- */
+  .sidebar-footer {
+    margin-top: auto;
+    padding: 1rem 0 0 0;
+    border-top: 1px solid #1a1a1a;
+
+    .nav-item.logout {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-size: 1.05rem;
+      background: transparent;
+      color: #e74c3c;
+      padding: 12px;
+      border-radius: 20px;
+      border: none;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s, transform 0.2s;
+      width: 100%; // fills sidebar width
+
+      svg {
+        font-size: 22px;
+        color: #e74c3c;
+        transition: color 0.2s, transform 0.2s;
+      }
+
+      span {
+        color: #e74c3c;
+        font-weight: 600;
+      }
+
+      &:hover {
+        background: rgba(231, 76, 60, 0.15);
+        color: #ff6b6b;
+
+        svg {
+          color: #ff6b6b;
+          transform: scale(1.15);
+        }
+
+        span {
+          color: #ff6b6b;
+        }
+      }
     }
   }
 }
 
-/* 📱 Mobile Responsive */
+/* 📉 Tablet collapse to icons only */
 @media (max-width: 900px) {
   .sidebar {
     width: 70px;
     padding: 20px 8px;
+    margin-left: auto;
 
     .sidebar-logo {
       justify-content: center;
@@ -120,8 +156,7 @@
     .sidebar-nav {
       align-items: center;
 
-      .nav-item,
-      .profile-link {
+      .nav-item {
         justify-content: center;
         gap: 0;
 
@@ -129,6 +164,79 @@
           display: none;
         }
       }
+    }
+
+    .sidebar-footer {
+      .nav-item.logout {
+        justify-content: center;
+        span {
+          display: none;
+        }
+      }
+    }
+  }
+}
+
+/* 📱 Hide sidebar completely on mobile */
+@media (max-width: 600px) {
+  .sidebar {
+    display: none;
+  }
+
+  body {
+    padding-bottom: 72px; // ensure content isn't hidden behind nav
+  }
+}
+
+/* 📱 Mobile bottom nav (portal rendered to body) */
+.mobile-bottom-nav {
+  position: fixed !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  height: 64px;
+  width: 100%;
+  background: #0a0a0a;
+  border-top: 1px solid #1a1a1a;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  z-index: 1000 !important;
+  padding: 0 6px;
+
+  .nav-item {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 8px 0;
+
+    svg {
+      font-size: 24px;
+      color: #888;
+      transition: color 0.2s ease, transform 0.15s ease;
+    }
+
+    &:hover svg {
+      color: #fff;
+      transform: scale(1.08);
+    }
+
+    &.active svg {
+      color: #1da1f2;
+      transform: scale(1.06);
+    }
+
+    &.logout svg {
+      color: #e74c3c;
+    }
+
+    &.logout:hover svg {
+      color: #ff6b6b;
+      transform: scale(1.15);
     }
   }
 }
