@@ -19,7 +19,7 @@ export default function HomeFeed({ currentUser }) {
   const feedRef = useRef(null);
 
   /** 🔹 Seed mock posts once on mount */
-  /** 🔹 Seed mock posts once on mount */
+/** 🔹 Seed mock posts once on mount */
 useEffect(() => {
   const mockPosts = [
     {
@@ -29,7 +29,7 @@ useEffect(() => {
       image: null,
       poll: null,
       visibility: "everyone",
-      likes: ["anon_user"],
+      likes: ["anon_user", "guest42"],
       comments: [
         { user: { handle: "guest42", avatar: defaultAvatar }, text: "Welcome Alice!", createdAt: Date.now() },
         { user: { handle: "dev_guy", avatar: defaultAvatar }, text: "Happy to be here 🙌", createdAt: Date.now() },
@@ -48,7 +48,7 @@ useEffect(() => {
       image: "https://picsum.photos/600/300?random=1",
       poll: null,
       visibility: "everyone",
-      likes: [],
+      likes: ["alice_dev"],
       comments: [
         { user: { handle: "anon_user", avatar: defaultAvatar }, text: "That’s beautiful!", createdAt: Date.now() },
       ],
@@ -62,11 +62,11 @@ useEffect(() => {
     {
       id: 3,
       user: { handle: "nature_lover", avatar: defaultAvatar },
-      content: "Morning hike vibes 🌲",
+      content: "Morning hike vibes 🌲 Feeling refreshed!",
       image: "https://picsum.photos/600/300?random=2",
       poll: null,
       visibility: "everyone",
-      likes: [],
+      likes: ["guest_photos"],
       comments: [],
       reposts: [],
       reports: [],
@@ -78,12 +78,12 @@ useEffect(() => {
     {
       id: 4,
       user: { handle: "foodie123", avatar: defaultAvatar },
-      content: "Homemade pasta dinner 🍝",
+      content: "Homemade pasta dinner 🍝 The recipe is a secret 😉",
       image: "https://picsum.photos/600/300?random=3",
       poll: null,
       visibility: "everyone",
-      likes: [],
-      comments: [],
+      likes: ["anon_user", "nature_lover"],
+      comments: [{ user: { handle: "guest42", avatar: defaultAvatar }, text: "Looks delicious!", createdAt: Date.now() }],
       reposts: [],
       reports: [],
       hidden: false,
@@ -94,11 +94,11 @@ useEffect(() => {
     {
       id: 5,
       user: { handle: "travel_bug", avatar: defaultAvatar },
-      content: "Exploring the city streets 🏙️",
+      content: "Exploring the city streets 🏙️ Found some hidden gems!",
       image: "https://picsum.photos/600/300?random=4",
       poll: null,
       visibility: "everyone",
-      likes: [],
+      likes: ["foodie123"],
       comments: [],
       reposts: [],
       reports: [],
@@ -121,7 +121,7 @@ useEffect(() => {
         ],
       },
       visibility: "everyone",
-      likes: [],
+      likes: ["alice_dev"],
       comments: [],
       reposts: [],
       reports: [],
@@ -131,8 +131,45 @@ useEffect(() => {
       isRepost: false,
     },
   ];
+
+  
+  const users = ["coder99", "traveler42", "photogirl", "chefMike", "gamerX", "bookworm", "natureFan"];
+  const sampleComments = [
+    "Amazing!", "Love this post 😍", "Great picture!", "Interesting...", "I totally agree!", "Wow!", "Looks fun!"
+  ];
+
+  for (let i = 7; i <= 20; i++) {
+    const randomUser = users[Math.floor(Math.random() * users.length)];
+    const randomCommentsCount = Math.floor(Math.random() * 3);
+    const comments = Array.from({ length: randomCommentsCount }, () => ({
+      user: { handle: users[Math.floor(Math.random() * users.length)], avatar: defaultAvatar },
+      text: sampleComments[Math.floor(Math.random() * sampleComments.length)],
+      createdAt: Date.now(),
+    }));
+
+    mockPosts.push({
+      id: i,
+      user: { handle: randomUser, avatar: defaultAvatar },
+      content: `Random post content #${i} ✨ Loving the vibes today!`,
+      image: Math.random() > 0.5 ? `https://picsum.photos/600/300?random=${i}` : null,
+      poll: Math.random() > 0.85 ? { options: ["Yes", "No"], duration: "2d", votes: [] } : null,
+      visibility: "everyone",
+      likes: Array.from({ length: Math.floor(Math.random() * 5) }, () => users[Math.floor(Math.random() * users.length)]),
+      comments,
+      reposts: [],
+      reports: [],
+      hidden: false,
+      createdAt: Date.now(),
+      showComments: false,
+      isRepost: false,
+    });
+  }
+
   setPosts(mockPosts);
 }, []);
+
+
+
 
 
   /** Emoji selection */

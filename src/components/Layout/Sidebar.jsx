@@ -1,5 +1,5 @@
 // src/components/Layout/Sidebar.jsx
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import {
   FiHome,
@@ -9,15 +9,18 @@ import {
   FiBell,
   FiPlusSquare,
   FiUser,
-  FiLogOut, // ✅ logout icon
+  FiLogOut,
 } from "react-icons/fi";
 import logo from "../../assets/logo.png";
+import defaultAvatar from "../../assets/default-avatar.png";
 import "./Sidebar.scss";
 
 export default function Sidebar({ active, setActive }) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [profileMenuOpen, setProfileMenuOpen] = useState(false);
+  const profileRef = useRef(null);
 
   useEffect(() => {
     setMounted(true); // only after client-side render
@@ -33,6 +36,17 @@ export default function Sidebar({ active, setActive }) {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  // Close profile menu if clicked outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (profileRef.current && !profileRef.current.contains(e.target)) {
+        setProfileMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   const navItems = [
     { name: "Home", icon: <FiHome /> },
     { name: "Search", icon: <FiSearch /> },
@@ -40,17 +54,13 @@ export default function Sidebar({ active, setActive }) {
     { name: "Profile", icon: <FiUser /> },
   ];
 
-  // --- 🚪 Logout functionality ---
   const handleLogout = () => {
-    // Clear session/auth data
     localStorage.clear();
     sessionStorage.clear();
-
-    // Redirect to login page (or home)
     window.location.href = "/login";
   };
 
-  // --- 📱 Mobile bottom nav ---
+  // Mobile bottom nav
   if (isMobile && mounted) {
     return createPortal(
       <nav className="mobile-bottom-nav" role="navigation">
@@ -65,7 +75,6 @@ export default function Sidebar({ active, setActive }) {
             {item.icon}
           </button>
         ))}
-        {/* ✅ Logout button in mobile nav */}
         <button
           className="nav-item logout"
           onClick={handleLogout}
@@ -79,7 +88,7 @@ export default function Sidebar({ active, setActive }) {
     );
   }
 
-  // --- 💻 Desktop / Tablet sidebar ---
+  // Desktop / Tablet sidebar
   return (
     <aside className={`sidebar ${isCollapsed ? "collapsed" : ""}`}>
       <div className="sidebar-logo">
@@ -107,12 +116,24 @@ export default function Sidebar({ active, setActive }) {
         ))}
       </nav>
 
-      {/* ✅ Logout button at bottom */}
-      <div className="sidebar-footer">
-        <button className="nav-item logout" onClick={handleLogout} type="button">
-          <FiLogOut />
-          {!isCollapsed && <span>Logout</span>}
+      {/* Profile + logout toggle */}
+      <div className="sidebar-footer" ref={profileRef}>
+        <button
+          className="profile-btn"
+          type="button"
+          onClick={() => setProfileMenuOpen((p) => !p)}
+        >
+          <img src={defaultAvatar} alt="Profile" className="avatar" />
+          {!isCollapsed && <span>anon_user</span>}
         </button>
+
+        {profileMenuOpen && (
+          <div className="profile-menu">
+            <button className="logout-btn" onClick={handleLogout}>
+              <FiLogOut /> Logout
+            </button>
+          </div>
+        )}
       </div>
     </aside>
   );

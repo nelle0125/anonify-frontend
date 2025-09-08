@@ -5,7 +5,7 @@
   display: flex;
   flex-direction: column;
   margin-left: 100px;
-  height: 100vh; // 🔑 always full height
+  height: 100vh;
   position: sticky;
   top: 0;
   transition: width 0.4s ease-in-out, background 0.3s ease-in-out;
@@ -39,7 +39,7 @@
     display: flex;
     flex-direction: column;
     gap: 0.6rem;
-    flex: 1; // 🔑 pushes footer down
+    flex: 1;
 
     .nav-item {
       display: flex;
@@ -86,55 +86,81 @@
     }
   }
 
-  /* --- 🔴 Logout button fixed at bottom, fully visible --- */
+  /* Profile + logout toggle at bottom */
   .sidebar-footer {
     margin-top: auto;
-    padding: 1rem 0 0 0;
-    border-top: 1px solid #1a1a1a;
+    position: relative;
 
-    .nav-item.logout {
+    .profile-btn {
       display: flex;
       align-items: center;
-      gap: 14px;
-      font-size: 1.05rem;
-      background: transparent;
-      color: #e74c3c;
-      padding: 12px;
+      gap: 8px;
+      width: 100%;
+      padding: 10px 12px;
       border-radius: 20px;
       border: none;
+      background: transparent;
+      color: #ccc;
+      font-size: 1rem;
       cursor: pointer;
-      transition: background 0.2s, color 0.2s, transform 0.2s;
-      width: 100%; // fills sidebar width
-
-      svg {
-        font-size: 22px;
-        color: #e74c3c;
-        transition: color 0.2s, transform 0.2s;
-      }
-
-      span {
-        color: #e74c3c;
-        font-weight: 600;
-      }
+      transition: background 0.2s;
 
       &:hover {
-        background: rgba(231, 76, 60, 0.15);
-        color: #ff6b6b;
+        background: rgba(255, 255, 255, 0.1);
+      }
+
+      .avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        object-fit: cover;
+      }
+    }
+
+    .profile-menu {
+      position: absolute;
+      bottom: 50px;
+      left: 0;
+      width: 100%;
+      background: #1e1e1e;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      display: flex;
+      flex-direction: column;
+      z-index: 10;
+
+      .logout-btn {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 12px;
+        border: none;
+        background: transparent;
+        color: #e74c3c;
+        font-weight: 600;
+        cursor: pointer;
+        border-radius: 6px;
+        transition: background 0.2s, color 0.2s;
 
         svg {
-          color: #ff6b6b;
-          transform: scale(1.15);
+          font-size: 20px;
         }
 
-        span {
+        &:hover {
+          background: rgba(231, 76, 60, 0.15);
           color: #ff6b6b;
+
+          svg {
+            color: #ff6b6b;
+            transform: scale(1.15);
+          }
         }
       }
     }
   }
 }
 
-/* 📉 Tablet collapse to icons only */
+/* Tablet collapse to icons only */
 @media (max-width: 900px) {
   .sidebar {
     width: 70px;
@@ -167,28 +193,30 @@
     }
 
     .sidebar-footer {
-      .nav-item.logout {
+      .profile-btn {
         justify-content: center;
-        span {
-          display: none;
-        }
+      }
+
+      .profile-menu {
+        width: 200%;
+        left: -65px;
       }
     }
   }
 }
 
-/* 📱 Hide sidebar completely on mobile */
+/* Hide sidebar completely on mobile */
 @media (max-width: 600px) {
   .sidebar {
     display: none;
   }
 
   body {
-    padding-bottom: 72px; // ensure content isn't hidden behind nav
+    padding-bottom: 72px;
   }
 }
 
-/* 📱 Mobile bottom nav (portal rendered to body) */
+/* Mobile bottom nav */
 .mobile-bottom-nav {
   position: fixed !important;
   bottom: 0 !important;

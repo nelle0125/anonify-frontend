@@ -4,7 +4,7 @@ import { FiX, FiMessageCircle, FiThumbsUp, FiThumbsDown, FiTrash2 } from "react-
 import "./anonymousChat.scss";
 
 const AnonymousChat = ({ isOpen, toggleChat }) => {
-  const currentUser = "guest_" + Math.floor(Math.random() * 9999); // 👤 simulate user session
+  const currentUser = "guest_" + Math.floor(Math.random() * 9999); // simulate user session
 
   const [messages, setMessages] = useState([
     {
@@ -14,7 +14,7 @@ const AnonymousChat = ({ isOpen, toggleChat }) => {
       pinned: true,
       upvotes: 0,
       downvotes: 0,
-      votesByUser: {}, // 🔑 track votes { userId: "up" | "down" }
+      votesByUser: {},
       timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
     },
   ]);
@@ -30,7 +30,7 @@ const AnonymousChat = ({ isOpen, toggleChat }) => {
     }
   }, [messages]);
 
-  // Typing detection
+  // Typing detection for your own input
   useEffect(() => {
     if (input.length > 0) {
       setTyping(true);
@@ -40,6 +40,47 @@ const AnonymousChat = ({ isOpen, toggleChat }) => {
       setTyping(false);
     }
   }, [input]);
+
+  // Live mock messages from other users
+  useEffect(() => {
+    const mockMessages = [
+      "Hello everyone!",
+      "Anyone here?",
+      "This chat is awesome 😎",
+      "React + SASS is so cool!",
+      "How's everyone doing today?",
+      "Just testing the chat feature!",
+    ];
+
+    const interval = setInterval(() => {
+      const randomIndex = Math.floor(Math.random() * mockMessages.length);
+      const randomUser = `Guest${Math.floor(Math.random() * 9999)}`;
+      const newMsg = {
+        id: Date.now() + Math.random(),
+        user: randomUser,
+        text: mockMessages[randomIndex],
+        pinned: false,
+        upvotes: 0,
+        downvotes: 0,
+        votesByUser: {},
+        timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+      };
+      setMessages((prev) => [...prev, newMsg]);
+    }, 8000); // every 8 seconds
+
+    return () => clearInterval(interval);
+  }, []);
+
+  // Simulate occasional typing indicator from others
+  useEffect(() => {
+    const typingInterval = setInterval(() => {
+      setTyping(true);
+      const timeout = setTimeout(() => setTyping(false), 1500);
+      return () => clearTimeout(timeout);
+    }, 12000); // every 12 seconds
+
+    return () => clearInterval(typingInterval);
+  }, []);
 
   // Send message
   const handleSend = (e) => {
@@ -61,24 +102,21 @@ const AnonymousChat = ({ isOpen, toggleChat }) => {
     setInput("");
   };
 
-  // Voting logic (1 vote per user per message)
+  // Voting logic
   const handleVote = (msgId, type) => {
     setMessages((prev) =>
       prev.map((msg) => {
         if (msg.id !== msgId) return msg;
 
         const prevVote = msg.votesByUser[currentUser];
-
         let upvotes = msg.upvotes;
         let downvotes = msg.downvotes;
 
-        // If user is changing their vote
         if (prevVote && prevVote !== type) {
           if (prevVote === "up") upvotes -= 1;
           if (prevVote === "down") downvotes -= 1;
         }
 
-        // If user hasn’t voted yet OR is changing vote
         if (!prevVote || prevVote !== type) {
           if (type === "up") upvotes += 1;
           if (type === "down") downvotes += 1;
