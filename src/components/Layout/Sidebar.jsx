@@ -1,4 +1,4 @@
-// src/components/Layout/Sidebar.jsx
+
 import React, { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import {
@@ -23,7 +23,7 @@ export default function Sidebar({ active, setActive }) {
   const profileRef = useRef(null);
 
   useEffect(() => {
-    setMounted(true); // only after client-side render
+    setMounted(true); 
   }, []);
 
   useEffect(() => {
@@ -36,7 +36,7 @@ export default function Sidebar({ active, setActive }) {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Close profile menu if clicked outside
+  
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (profileRef.current && !profileRef.current.contains(e.target)) {
@@ -60,7 +60,7 @@ export default function Sidebar({ active, setActive }) {
     window.location.href = "/login";
   };
 
-  // Mobile bottom nav
+  
   if (isMobile && mounted) {
     return createPortal(
       <nav className="mobile-bottom-nav" role="navigation">
@@ -88,7 +88,7 @@ export default function Sidebar({ active, setActive }) {
     );
   }
 
-  // Desktop / Tablet sidebar
+  
   return (
     <aside className={`sidebar ${isCollapsed ? "collapsed" : ""}`}>
       <div className="sidebar-logo">
@@ -116,7 +116,7 @@ export default function Sidebar({ active, setActive }) {
         ))}
       </nav>
 
-      {/* Profile + logout toggle */}
+      
       <div className="sidebar-footer" ref={profileRef}>
         <button
           className="profile-btn"

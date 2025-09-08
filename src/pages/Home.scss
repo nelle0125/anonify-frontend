@@ -23,7 +23,7 @@
   flex: 1;
   box-sizing: border-box;
 
-  /* smooth scrolling + hide scrollbars */
+  
   overflow-y: auto;
   overflow-x: hidden;
   scroll-behavior: smooth;
@@ -33,7 +33,7 @@
     display: none;
   }
 
-  /* ---------------- CREATE POST ---------------- */
+  
 .create-post {
   display: flex;
   flex-direction: column;
@@ -54,7 +54,7 @@
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
   }
 
-  /* ---------------- TOP ROW ---------------- */
+  
   .top-row {
     display: flex;
     align-items: center;
@@ -92,7 +92,7 @@
     }
   }
 
-  /* ---------------- IMAGE PREVIEW ---------------- */
+  
   .image-preview {
     position: relative;
     border-radius: 12px;
@@ -126,7 +126,7 @@
     }
   }
 
-  /* ---------------- POLL BUILDER ---------------- */
+  
   .poll-builder {
     display: flex;
     flex-direction: column;
@@ -219,7 +219,7 @@
     }
   }
 
-  /* ---------------- ACTION ROW ---------------- */
+  
   .action-row {
     display: flex;
     justify-content: space-between;
@@ -316,7 +316,7 @@
     }
   }
 
-  /* ---------------- EMOJI PICKER ---------------- */
+  
   .emoji-picker-wrapper {
     position: absolute;
     top: 100%;
@@ -331,7 +331,7 @@
   }
 }
 
-/* ---------------- RESPONSIVE ---------------- */
+
 @media (max-width: 900px) {
   .create-post {
     padding: 12px;
@@ -363,7 +363,7 @@
   }
 }
 
-  /* ---------------- POST ITEM ---------------- */
+  
   .post-item {
     display: flex;
     flex-direction: column;
@@ -491,7 +491,7 @@
         border-radius: 12px;
       }
 
-      /* Polls with progress bars */
+      
       .post-poll {
         display: flex;
         flex-direction: column;
@@ -559,7 +559,7 @@
         }
       }
 
-      /* Post Metadata (badges) */
+      
       .post-meta {
         display: flex;
         flex-wrap: wrap;
@@ -652,7 +652,7 @@
       margin-top: 4px;
     }
 
-    /* ---------------- COMMENTS ---------------- */
+    
     .comment-list {
       display: flex;
       flex-direction: column;
@@ -756,7 +756,7 @@
   }
 }
 
-/* Smooth fadeInOut animation */
+
 @keyframes fadeInOut {
   0% { opacity: 0; transform: translateY(-10px); }
   10% { opacity: 1; transform: translateY(0); }
@@ -764,7 +764,7 @@
   100% { opacity: 0; transform: translateY(-10px); }
 }
 
-/* Base notification style */
+
 .notif-popup {
   position: fixed;
   top: 80px;
@@ -780,20 +780,20 @@
   text-align: center;
 }
 
-/* Repost notification */
+
 .notif-popup.repost {
-  background-color: #1da1f2; /* Twitter-like blue */
+  background-color: #1da1f2;
 }
 
-/* Report notification */
+
 .notif-popup.report {
-  background-color: #ff5c5c; /* Red for report */
+  background-color: #ff5c5c;
 }
 
 
 
 
-/* ---------------- RESPONSIVE ---------------- */
+
 @media (max-width: 900px) {
   .home-feed {
     padding: 14px;
@@ -810,7 +810,7 @@
     padding: 10px;
   }
 
-  /* Top row: hide avatar, make input adaptive */
+ 
   .create-post .top-row {
     gap: 8px;
     flex-wrap: nowrap;
@@ -822,9 +822,9 @@
   }
 
   .create-post input[type="text"] {
-    flex: 1;           /* fill remaining space */
-    min-width: 0;      /* allow shrinking if needed */
-    width: 100%;       /* ensure full width */
+    flex: 1;           
+    min-width: 0;      
+    width: 100%;       
     font-size: 13px;
     padding: 8px 12px;
     box-sizing: border-box;
@@ -838,20 +838,20 @@
     box-sizing: border-box;
   }
 
-  /* Post content */
+  
   .post-item .post-content {
     font-size: 13px;
   }
 
-  /* Comments */
+  
   .comment-bubble {
     font-size: 0.88rem;
     padding: 4px 6px;
   }
 
-  /* Action row */
+  
   .create-post .action-row {
-    flex-wrap: wrap;          /* wrap if necessary */
+    flex-wrap: wrap;          
     justify-content: space-between;
     gap: 6px;
   }
@@ -862,7 +862,7 @@
   }
 
   .post-btn {
-    flex: 0 0 auto;           /* keep original width */
+    flex: 0 0 auto;           
     min-width: 90px;
   }
 }

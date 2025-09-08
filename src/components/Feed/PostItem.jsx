@@ -32,22 +32,22 @@ export default function PostItem({
   const liked = likes.includes(userHandle);
   const reposted = reposts.includes(userHandle);
 
-  /** Original post for repost */
+  
   const originalPost = post.originalPostId
     ? posts.find((p) => p.id === post.originalPostId)
     : null;
 
-  /** Use poll votes from original post if reposted */
+  
   const pollData = originalPost?.poll || post.poll;
   const pollVotes = originalPost?.poll?.votes || post.poll?.votes || [];
 
-  /** Sync local userVote if already voted */
+  
   useEffect(() => {
     const existingVote = pollVotes.find((v) => v.user === userHandle);
     if (existingVote) setUserVote(existingVote.option);
   }, [pollVotes, userHandle]);
 
-  /** Poll voting */
+  
   const handleVote = (option) => {
     if (!pollData || userVote) return;
     setUserVote(option);
@@ -64,7 +64,7 @@ export default function PostItem({
     });
   };
 
-  /** Event handlers */
+  
   const handleLike = () => onLike?.(post.id);
   const handleRepost = () => onRepost?.(post.id);
   const handleToggleComments = () => onToggleComments?.(post.id);
@@ -79,7 +79,7 @@ export default function PostItem({
     onDelete?.(post.id);
   };
 
-  /** Time formatter */
+  
   const timeAgo = (timestamp) => {
     if (!timestamp) return "";
     const diff = Math.floor((Date.now() - new Date(timestamp)) / 1000);
@@ -91,7 +91,7 @@ export default function PostItem({
 
   return (
     <article className={`post-item ${isEmbedded ? "embedded" : ""}`}>
-      {/* HEADER */}
+      
       <div className="post-header">
         <div className="post-user">
           <img
@@ -113,7 +113,7 @@ export default function PostItem({
           </div>
         </div>
 
-        {/* Options Dropdown */}
+        
         <div className="post-options-wrapper">
           <button
             className="post-options"
@@ -133,7 +133,7 @@ export default function PostItem({
         </div>
       </div>
 
-      {/* BODY */}
+      
       <div className="post-body">
         {originalPost ? (
           <PostItem
@@ -182,7 +182,7 @@ export default function PostItem({
         )}
       </div>
 
-      {/* ACTIONS */}
+      
       {!isEmbedded && (
         <div className="post-actions">
           <button

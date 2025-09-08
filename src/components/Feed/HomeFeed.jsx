@@ -1,4 +1,4 @@
-// src/components/Feed/HomeFeed.jsx
+
 import React, { useState, useEffect, useRef } from "react";
 import PostItem from "./PostItem";
 import defaultAvatar from "../../assets/default-avatar.png";
@@ -18,8 +18,7 @@ export default function HomeFeed({ currentUser }) {
   const [visibility, setVisibility] = useState("everyone");
   const feedRef = useRef(null);
 
-  /** 🔹 Seed mock posts once on mount */
-/** 🔹 Seed mock posts once on mount */
+ 
 useEffect(() => {
   const mockPosts = [
     {
@@ -172,10 +171,10 @@ useEffect(() => {
 
 
 
-  /** Emoji selection */
+
   const onEmojiClick = ({ emoji }) => setNewPostText((prev) => prev + emoji);
 
-  /** Image upload */
+
   const handleImageUpload = (e) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
@@ -186,7 +185,7 @@ useEffect(() => {
   };
   const removeImage = () => setNewPostImage(null);
 
-  /** Poll management */
+
   const addPollOption = () => pollOptions.length < 4 && setPollOptions([...pollOptions, ""]);
   const updatePollOption = (i, val) => {
     const updated = [...pollOptions];
@@ -200,7 +199,7 @@ useEffect(() => {
     setShowPoll(false);
   };
 
-  /** Create new post */
+
   const handleCreatePost = () => {
     const hasPoll = showPoll && pollOptions.some((o) => o.trim());
     if (!newPostText.trim() && !newPostImage && !hasPoll) return;
@@ -233,7 +232,7 @@ useEffect(() => {
     setVisibility("everyone");
   };
 
-  /** Like a post */
+
   const handleLike = (postId) => {
     const userHandle = currentUser?.handle || "anon_user";
     setPosts((prev) =>
@@ -245,7 +244,7 @@ useEffect(() => {
     );
   };
 
-  /** Repost logic */
+
   const handleRepost = (postId) => {
     const userHandle = currentUser?.handle || "anon_user";
     const targetPost = posts.find((p) => p.id === postId);
@@ -289,7 +288,7 @@ useEffect(() => {
     }
   };
 
-  /** Add comment */
+
   const handleAddComment = (postId, text) => {
     if (!text.trim()) return;
     setPosts((prev) =>
@@ -297,12 +296,12 @@ useEffect(() => {
     );
   };
 
-  /** Toggle comments */
+
   const handleToggleComments = (postId) => {
     setPosts((prev) => prev.map((p) => (p.id === postId ? { ...p, showComments: !p.showComments } : p)));
   };
 
-  /** Poll voting */
+
   const handleVote = (postId, option) => {
     const userHandle = currentUser?.handle || "anon_user";
     setPosts((prev) =>
@@ -316,7 +315,7 @@ useEffect(() => {
     );
   };
 
-  /** Report post */
+
   const handleReport = (postId) => {
     const userHandle = currentUser?.handle || "anon_user";
     setPosts((prev) =>
@@ -331,10 +330,10 @@ useEffect(() => {
     setTimeout(() => setNotif(null), 3000);
   };
 
-  /** Delete post */
+
   const handleDelete = (postId) => setPosts((prev) => prev.filter((p) => p.id !== postId));
 
-  /** Hide emoji picker on scroll */
+
   useEffect(() => {
     const feedEl = feedRef.current;
     if (!feedEl) return;
@@ -345,7 +344,7 @@ useEffect(() => {
 
   return (
     <div className="home-feed" ref={feedRef}>
-      {/* ✅ CREATE POST */}
+      
       <div className="create-post">
         <div className="top-row">
           <img src={currentUser?.avatar || defaultAvatar} alt="user" className="avatar" />
@@ -435,10 +434,10 @@ useEffect(() => {
         )}
       </div>
 
-      {/* Notification popup */}
+      
       {notif && <div className={`notif-popup ${notif.type}`}>{notif.message}</div>}
 
-      {/* POSTS */}
+      
       {posts.filter((p) => !p.hidden).length === 0 ? (
         <p className="empty-feed">No posts yet.</p>
       ) : (

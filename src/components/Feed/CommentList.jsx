@@ -1,11 +1,11 @@
-// src/components/Feed/CommentList.jsx
+
 import React, { useState } from "react";
 import defaultAvatar from "../../assets/default-avatar.png";
 
 export default function CommentList({ comments, addComment, currentUser }) {
   const [text, setText] = useState("");
 
-  /** Submit new comment */
+ 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!text.trim()) return;
@@ -13,7 +13,7 @@ export default function CommentList({ comments, addComment, currentUser }) {
     setText("");
   };
 
-  /** Allow Enter to submit (Shift+Enter = newline) */
+  
   const handleKeyDown = (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
@@ -21,7 +21,7 @@ export default function CommentList({ comments, addComment, currentUser }) {
     }
   };
 
-  /** Format time ago for comments */
+  
   const timeAgo = (timestamp) => {
     if (!timestamp) return "";
     const diff = Math.floor((Date.now() - new Date(timestamp)) / 1000);
@@ -33,7 +33,7 @@ export default function CommentList({ comments, addComment, currentUser }) {
 
   return (
     <div className="comment-list">
-      {/* Existing Comments */}
+      
       {comments.map((c, index) => (
         <div key={index} className="comment-item">
           <img
@@ -51,7 +51,7 @@ export default function CommentList({ comments, addComment, currentUser }) {
         </div>
       ))}
 
-      {/* Add New Comment */}
+      
       <form className="comment-form" onSubmit={handleSubmit}>
         <img
           src={currentUser?.avatar || defaultAvatar}

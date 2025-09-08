@@ -1,10 +1,10 @@
-// src/components/Chat/AnonymousChat.jsx
+
 import React, { useState, useEffect, useRef } from "react";
 import { FiX, FiMessageCircle, FiThumbsUp, FiThumbsDown, FiTrash2 } from "react-icons/fi";
 import "./anonymousChat.scss";
 
 const AnonymousChat = ({ isOpen, toggleChat }) => {
-  const currentUser = "guest_" + Math.floor(Math.random() * 9999); // simulate user session
+  const currentUser = "guest_" + Math.floor(Math.random() * 9999);
 
   const [messages, setMessages] = useState([
     {
@@ -23,14 +23,14 @@ const AnonymousChat = ({ isOpen, toggleChat }) => {
   const [typing, setTyping] = useState(false);
   const chatEndRef = useRef(null);
 
-  // Auto-scroll
+
   useEffect(() => {
     if (chatEndRef.current) {
       chatEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [messages]);
 
-  // Typing detection for your own input
+  
   useEffect(() => {
     if (input.length > 0) {
       setTyping(true);
@@ -41,7 +41,7 @@ const AnonymousChat = ({ isOpen, toggleChat }) => {
     }
   }, [input]);
 
-  // Live mock messages from other users
+
   useEffect(() => {
     const mockMessages = [
       "Hello everyone!",
@@ -66,23 +66,23 @@ const AnonymousChat = ({ isOpen, toggleChat }) => {
         timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
       };
       setMessages((prev) => [...prev, newMsg]);
-    }, 8000); // every 8 seconds
+    }, 8000);
 
     return () => clearInterval(interval);
   }, []);
 
-  // Simulate occasional typing indicator from others
+  
   useEffect(() => {
     const typingInterval = setInterval(() => {
       setTyping(true);
       const timeout = setTimeout(() => setTyping(false), 1500);
       return () => clearTimeout(timeout);
-    }, 12000); // every 12 seconds
+    }, 12000); 
 
     return () => clearInterval(typingInterval);
   }, []);
 
-  // Send message
+  
   const handleSend = (e) => {
     e.preventDefault();
     if (!input.trim()) return;
@@ -102,7 +102,7 @@ const AnonymousChat = ({ isOpen, toggleChat }) => {
     setInput("");
   };
 
-  // Voting logic
+  
   const handleVote = (msgId, type) => {
     setMessages((prev) =>
       prev.map((msg) => {
@@ -135,14 +135,14 @@ const AnonymousChat = ({ isOpen, toggleChat }) => {
     );
   };
 
-  // Delete message
+  
   const handleDelete = (msgId) => {
     setMessages((prev) => prev.filter((msg) => msg.id !== msgId));
   };
 
   return (
     <>
-      {/* Floating Toggle Button */}
+      
       <button
         className={`chat-fab ${isOpen ? "open" : ""}`}
         onClick={toggleChat}
@@ -151,7 +151,7 @@ const AnonymousChat = ({ isOpen, toggleChat }) => {
         {isOpen ? <FiX size={22} /> : <FiMessageCircle size={22} />}
       </button>
 
-      {/* Chat Window */}
+      
       <div className={`anonymous-chat ${isOpen ? "open" : ""}`}>
         <div className="chat-header">Public Anonymous Chat</div>
 

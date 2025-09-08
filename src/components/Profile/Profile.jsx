@@ -1,6 +1,6 @@
-// src/components/Profile/Profile.jsx
+
 import React, { useState, useRef } from "react";
-import HomeFeed from "../Feed/HomeFeed"; // reuse HomeFeed create post
+import HomeFeed from "../Feed/HomeFeed"; 
 import "./profile.scss";
 
 const Profile = ({ currentUser }) => {
@@ -28,9 +28,9 @@ const Profile = ({ currentUser }) => {
 
   return (
     <div className="profile-page">
-      {/* ✅ Centered container */}
+      
       <div className="profile-container">
-        {/* Header */}
+        
         <div className="profile-header">
           <div className="avatar-wrapper">
             <img
@@ -86,7 +86,7 @@ const Profile = ({ currentUser }) => {
           </div>
         </div>
 
-        {/* Stats */}
+        
         <div className="profile-stats">
           <div className="stat">
             <div className="count">{followersCount}</div>
@@ -98,12 +98,12 @@ const Profile = ({ currentUser }) => {
           </div>
         </div>
 
-        {/* Feed */}
+        
         <div className="profile-feed-wrapper" ref={feedRef}>
-          {/* Create Post & Emoji Picker */}
+          
           <HomeFeed currentUser={currentUser} onNewPost={handleNewPost} />
 
-          {/* User posts */}
+          
           {userPosts.length > 0 &&
             userPosts.map((post) => (
               <div key={post.id} className="post-item">

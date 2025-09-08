@@ -86,7 +86,7 @@
     }
   }
 
-  /* Profile + logout toggle at bottom */
+  
   .sidebar-footer {
     margin-top: auto;
     position: relative;
@@ -160,7 +160,7 @@
   }
 }
 
-/* Tablet collapse to icons only */
+
 @media (max-width: 900px) {
   .sidebar {
     width: 70px;
@@ -205,7 +205,7 @@
   }
 }
 
-/* Hide sidebar completely on mobile */
+
 @media (max-width: 600px) {
   .sidebar {
     display: none;

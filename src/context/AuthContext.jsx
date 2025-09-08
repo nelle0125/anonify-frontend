@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from
 'react';
 import { useNavigate } from 'react-router-dom';
-// In-memory mock DB (dev only)
+
 const _mockDB = { usersByEmail: {}, idSeq: 1 };
 function delay(ms = 450) {
  return new Promise((res) => setTimeout(res, ms));
@@ -18,7 +18,7 @@ async function mockRegister({ email, password, handle, displayName }) {
  email,
  handle,
  displayName: displayName || handle,
- password, // only for mock
+ password, 
  createdAt: new Date().toISOString(),
  };
  _mockDB.usersByEmail[email] = user;

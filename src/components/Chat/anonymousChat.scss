@@ -119,21 +119,21 @@
             }
 
             &:nth-child(1) {
-              color: #4dabf7; // upvote blue
+              color: #4dabf7; 
               &:hover {
                 color: #1c7ed6;
               }
             }
 
             &:nth-child(2) {
-              color: #fa5252; // downvote red
+              color: #fa5252; 
               &:hover {
                 color: #c92a2a;
               }
             }
 
             &:nth-child(3) {
-              color: #999; // delete
+              color: #999; 
               &:hover {
                 color: #fff;
               }
@@ -227,7 +227,7 @@
      .chat-fab {
     bottom: 90px;
     right: 20px;
-    z-index: 2000; // ⬅️ ensure it floats above sidebar
+    z-index: 2000; 
   }
 
 }
