@@ -1,12 +1,15 @@
 .profile-page {
-  background: #0a0a0a;
-  color: #ccc;
-  min-height: 105vh;
-  font-family: "Helvetica", sans-serif;
-  display: flex;
-  flex-direction: column;
-  overflow-x: hidden;   
-  overflow-y: auto;
+ background: linear-gradient(rgba(0, 0, 0, 0.236), rgba(0,0,0,0.6)),
+            url("../assets/bg.jpg") no-repeat center center;
+background-size: cover;
+color: #ccc;
+min-height: 105vh;
+font-family: "Helvetica", sans-serif;
+display: flex;
+flex-direction: column;
+overflow-x: hidden;   
+overflow-y: auto;
+
 
   
   .profile-container {

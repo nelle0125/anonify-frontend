@@ -29,7 +29,7 @@ $card-bg: rgba(255,255,255,0.03);
  margin: 0 auto;
  width: 140px;
  height: 140px;
- animation: spinFade 1.8s ease-in-out forwards;
+ animation: spinFade 3.0s ease-in-out forwards;
  }
 }
 @keyframes spinFade {
@@ -57,12 +57,21 @@ $card-bg: rgba(255,255,255,0.03);
  .left-sub { color: $muted; margin: 0; }
 }
 .split-right {
- display: flex;
- align-items: center;
- justify-content: center;
- padding: 48px; 
- .right-inner { width: 100%; max-width: 460px; }
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px; 
+
+  background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), 
+              url("../assets/bg.jpg") no-repeat center center;
+  background-size: cover;
+
+  .right-inner { 
+    width: 100%; 
+    max-width: 460px; 
+  }
 }
+
 .auth-card {
  background: $card-bg;
  border-radius: 18px;
